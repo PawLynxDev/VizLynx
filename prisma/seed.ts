@@ -1,0 +1,853 @@
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+const templates = [
+  // --- EXISTING 3 (updated with some semantic slots) ---
+  {
+    name: "Product Showcase",
+    description: "Clean, centered product display with gradient background and bold headline.",
+    thumbnail: "/templates/product-showcase.png",
+    category: "social",
+    config: {
+      width: 1080,
+      height: 1080,
+      background: {
+        type: "gradient",
+        colors: ["{{primary}}", "#764ba2"],
+        direction: "to bottom right",
+      },
+      layout: "centered",
+      productImage: {
+        maxWidth: 700,
+        maxHeight: 700,
+        x: "center",
+        y: "center",
+        offsetY: -40,
+      },
+      textOverlays: [
+        {
+          text: "NEW ARRIVAL",
+          font: "{{heading}}",
+          size: 48,
+          weight: "bold",
+          color: "#ffffff",
+          align: "center",
+          x: "center",
+          y: 900,
+        },
+        {
+          text: "Shop Now",
+          font: "{{body}}",
+          size: 32,
+          weight: "semibold",
+          color: "#ffffff",
+          align: "center",
+          x: "center",
+          y: 980,
+          background: {
+            color: "rgba(0,0,0,0.3)",
+            paddingX: 40,
+            paddingY: 12,
+            borderRadius: 8,
+          },
+        },
+      ],
+    },
+  },
+  {
+    name: "Social Post",
+    description: "Split layout with product on one side and text content on the other.",
+    thumbnail: "/templates/social-post.png",
+    category: "social",
+    config: {
+      width: 1080,
+      height: 1080,
+      background: {
+        type: "solid",
+        color: "{{background}}",
+      },
+      layout: "split_horizontal",
+      productImage: {
+        maxWidth: 500,
+        maxHeight: 800,
+        x: 40,
+        y: "center",
+      },
+      textOverlays: [
+        {
+          text: "TRENDING NOW",
+          font: "{{body}}",
+          size: 28,
+          weight: "bold",
+          color: "{{primary}}",
+          align: "left",
+          x: 580,
+          y: 300,
+        },
+        {
+          text: "Your Product",
+          font: "{{heading}}",
+          size: 56,
+          weight: "bold",
+          color: "{{text}}",
+          align: "left",
+          x: 580,
+          y: 360,
+        },
+        {
+          text: "Name Here",
+          font: "{{heading}}",
+          size: 56,
+          weight: "bold",
+          color: "{{text}}",
+          align: "left",
+          x: 580,
+          y: 430,
+        },
+        {
+          text: "Discover More",
+          font: "{{body}}",
+          size: 28,
+          weight: "semibold",
+          color: "#ffffff",
+          align: "center",
+          x: 700,
+          y: 560,
+          background: {
+            color: "{{primary}}",
+            paddingX: 36,
+            paddingY: 14,
+            borderRadius: 8,
+          },
+        },
+      ],
+    },
+  },
+  {
+    name: "Sale Promo",
+    description: "Eye-catching sale banner with bold discount text and vibrant colors.",
+    thumbnail: "/templates/sale-promo.png",
+    category: "promo",
+    config: {
+      width: 1080,
+      height: 1080,
+      background: {
+        type: "gradient",
+        colors: ["{{accent}}", "#ff4b2b"],
+        direction: "to bottom right",
+      },
+      layout: "overlay",
+      productImage: {
+        maxWidth: 600,
+        maxHeight: 600,
+        x: "center",
+        y: "center",
+        offsetY: 20,
+      },
+      textOverlays: [
+        {
+          text: "MEGA SALE",
+          font: "{{heading}}",
+          size: 72,
+          weight: "bold",
+          color: "#ffffff",
+          align: "center",
+          x: "center",
+          y: 120,
+        },
+        {
+          text: "UP TO 50% OFF",
+          font: "{{body}}",
+          size: 36,
+          weight: "semibold",
+          color: "#fff3cd",
+          align: "center",
+          x: "center",
+          y: 210,
+        },
+        {
+          text: "Shop Now",
+          font: "{{body}}",
+          size: 32,
+          weight: "bold",
+          color: "{{accent}}",
+          align: "center",
+          x: "center",
+          y: 960,
+          background: {
+            color: "#ffffff",
+            paddingX: 48,
+            paddingY: 14,
+            borderRadius: 30,
+          },
+        },
+      ],
+    },
+  },
+
+  // --- 10 NEW TEMPLATES ---
+
+  // 4. Minimal Product Card (product)
+  {
+    name: "Minimal Product Card",
+    description: "Clean white card with subtle shadow feel, product centered with minimal text.",
+    thumbnail: "/templates/minimal-product-card.png",
+    category: "product",
+    config: {
+      width: 1080,
+      height: 1080,
+      background: {
+        type: "solid",
+        color: "{{background}}",
+      },
+      layout: "centered",
+      productImage: {
+        maxWidth: 650,
+        maxHeight: 650,
+        x: "center",
+        y: "center",
+        offsetY: -60,
+      },
+      textOverlays: [
+        {
+          text: "Product Name",
+          font: "{{heading}}",
+          size: 42,
+          weight: "bold",
+          color: "{{text}}",
+          align: "center",
+          x: "center",
+          y: 880,
+        },
+        {
+          text: "$49.99",
+          font: "{{body}}",
+          size: 32,
+          weight: "semibold",
+          color: "{{primary}}",
+          align: "center",
+          x: "center",
+          y: 940,
+        },
+      ],
+    },
+  },
+
+  // 5. Bold Story (story, 1080x1920 base)
+  {
+    name: "Bold Story",
+    description: "Full-screen vertical story with bold headline overlay and gradient.",
+    thumbnail: "/templates/bold-story.png",
+    category: "story",
+    config: {
+      width: 1080,
+      height: 1920,
+      background: {
+        type: "gradient",
+        colors: ["{{secondary}}", "{{primary}}"],
+        direction: "to bottom",
+      },
+      layout: "centered",
+      productImage: {
+        maxWidth: 800,
+        maxHeight: 900,
+        x: "center",
+        y: "center",
+        offsetY: -100,
+      },
+      textOverlays: [
+        {
+          text: "NEW DROP",
+          font: "{{heading}}",
+          size: 80,
+          weight: "bold",
+          color: "#ffffff",
+          align: "center",
+          x: "center",
+          y: 1500,
+        },
+        {
+          text: "Available Now",
+          font: "{{body}}",
+          size: 36,
+          weight: "normal",
+          color: "rgba(255,255,255,0.8)",
+          align: "center",
+          x: "center",
+          y: 1580,
+        },
+        {
+          text: "Swipe Up",
+          font: "{{body}}",
+          size: 28,
+          weight: "semibold",
+          color: "#ffffff",
+          align: "center",
+          x: "center",
+          y: 1800,
+          background: {
+            color: "{{accent}}",
+            paddingX: 40,
+            paddingY: 12,
+            borderRadius: 24,
+          },
+        },
+      ],
+    },
+  },
+
+  // 6. Instagram Carousel Slide (social)
+  {
+    name: "Carousel Slide",
+    description: "Clean numbered carousel slide for Instagram with headline and description.",
+    thumbnail: "/templates/carousel-slide.png",
+    category: "social",
+    config: {
+      width: 1080,
+      height: 1080,
+      background: {
+        type: "solid",
+        color: "{{primary}}",
+      },
+      layout: "centered",
+      productImage: {
+        maxWidth: 500,
+        maxHeight: 500,
+        x: "center",
+        y: "center",
+        offsetY: -80,
+      },
+      textOverlays: [
+        {
+          text: "01",
+          font: "{{heading}}",
+          size: 120,
+          weight: "bold",
+          color: "rgba(255,255,255,0.15)",
+          align: "right",
+          x: 1020,
+          y: 140,
+        },
+        {
+          text: "Feature Highlight",
+          font: "{{heading}}",
+          size: 44,
+          weight: "bold",
+          color: "#ffffff",
+          align: "center",
+          x: "center",
+          y: 860,
+        },
+        {
+          text: "Describe this amazing feature",
+          font: "{{body}}",
+          size: 24,
+          weight: "normal",
+          color: "rgba(255,255,255,0.8)",
+          align: "center",
+          x: "center",
+          y: 920,
+        },
+      ],
+    },
+  },
+
+  // 7. Facebook Ad Banner (ad, 1200x628 base)
+  {
+    name: "Facebook Ad Banner",
+    description: "Wide-format ad banner optimized for Facebook feed with CTA button.",
+    thumbnail: "/templates/fb-ad-banner.png",
+    category: "ad",
+    config: {
+      width: 1200,
+      height: 628,
+      background: {
+        type: "gradient",
+        colors: ["{{background}}", "#f0f0f0"],
+        direction: "to right",
+      },
+      layout: "split_horizontal",
+      productImage: {
+        maxWidth: 450,
+        maxHeight: 500,
+        x: 50,
+        y: "center",
+      },
+      textOverlays: [
+        {
+          text: "Limited Time Offer",
+          font: "{{body}}",
+          size: 22,
+          weight: "semibold",
+          color: "{{accent}}",
+          align: "left",
+          x: 560,
+          y: 180,
+        },
+        {
+          text: "Your Product",
+          font: "{{heading}}",
+          size: 48,
+          weight: "bold",
+          color: "{{text}}",
+          align: "left",
+          x: 560,
+          y: 240,
+        },
+        {
+          text: "Headline Here",
+          font: "{{heading}}",
+          size: 48,
+          weight: "bold",
+          color: "{{text}}",
+          align: "left",
+          x: 560,
+          y: 300,
+        },
+        {
+          text: "Shop Now",
+          font: "{{body}}",
+          size: 24,
+          weight: "bold",
+          color: "#ffffff",
+          align: "center",
+          x: 680,
+          y: 420,
+          background: {
+            color: "{{primary}}",
+            paddingX: 40,
+            paddingY: 14,
+            borderRadius: 8,
+          },
+        },
+      ],
+    },
+  },
+
+  // 8. Announcement Post (social)
+  {
+    name: "Announcement Post",
+    description: "Bold announcement layout with large text and centered product.",
+    thumbnail: "/templates/announcement-post.png",
+    category: "social",
+    config: {
+      width: 1080,
+      height: 1080,
+      background: {
+        type: "solid",
+        color: "{{secondary}}",
+      },
+      layout: "centered",
+      productImage: {
+        maxWidth: 550,
+        maxHeight: 550,
+        x: "center",
+        y: "center",
+        offsetY: 30,
+      },
+      textOverlays: [
+        {
+          text: "JUST LAUNCHED",
+          font: "{{heading}}",
+          size: 56,
+          weight: "bold",
+          color: "{{accent}}",
+          align: "center",
+          x: "center",
+          y: 100,
+        },
+        {
+          text: "Be the first to get it",
+          font: "{{body}}",
+          size: 28,
+          weight: "normal",
+          color: "rgba(255,255,255,0.7)",
+          align: "center",
+          x: "center",
+          y: 160,
+        },
+        {
+          text: "Learn More",
+          font: "{{body}}",
+          size: 26,
+          weight: "semibold",
+          color: "{{secondary}}",
+          align: "center",
+          x: "center",
+          y: 980,
+          background: {
+            color: "#ffffff",
+            paddingX: 36,
+            paddingY: 12,
+            borderRadius: 8,
+          },
+        },
+      ],
+    },
+  },
+
+  // 9. Flash Sale Story (story, 1080x1920)
+  {
+    name: "Flash Sale Story",
+    description: "Vertical story layout for flash sales with countdown urgency.",
+    thumbnail: "/templates/flash-sale-story.png",
+    category: "story",
+    config: {
+      width: 1080,
+      height: 1920,
+      background: {
+        type: "gradient",
+        colors: ["{{accent}}", "#ff8a00"],
+        direction: "to bottom",
+      },
+      layout: "centered",
+      productImage: {
+        maxWidth: 700,
+        maxHeight: 800,
+        x: "center",
+        y: "center",
+        offsetY: -50,
+      },
+      textOverlays: [
+        {
+          text: "FLASH SALE",
+          font: "{{heading}}",
+          size: 72,
+          weight: "bold",
+          color: "#ffffff",
+          align: "center",
+          x: "center",
+          y: 200,
+        },
+        {
+          text: "24 HOURS ONLY",
+          font: "{{body}}",
+          size: 32,
+          weight: "semibold",
+          color: "rgba(255,255,255,0.9)",
+          align: "center",
+          x: "center",
+          y: 280,
+        },
+        {
+          text: "70% OFF",
+          font: "{{heading}}",
+          size: 96,
+          weight: "bold",
+          color: "#ffffff",
+          align: "center",
+          x: "center",
+          y: 1600,
+        },
+        {
+          text: "Shop Now",
+          font: "{{body}}",
+          size: 30,
+          weight: "bold",
+          color: "{{accent}}",
+          align: "center",
+          x: "center",
+          y: 1780,
+          background: {
+            color: "#ffffff",
+            paddingX: 48,
+            paddingY: 14,
+            borderRadius: 30,
+          },
+        },
+      ],
+    },
+  },
+
+  // 10. Testimonial Card (social)
+  {
+    name: "Testimonial Card",
+    description: "Customer testimonial layout with product image and quote.",
+    thumbnail: "/templates/testimonial-card.png",
+    category: "social",
+    config: {
+      width: 1080,
+      height: 1080,
+      background: {
+        type: "solid",
+        color: "{{background}}",
+      },
+      layout: "centered",
+      productImage: {
+        maxWidth: 400,
+        maxHeight: 400,
+        x: "center",
+        y: "center",
+        offsetY: -120,
+      },
+      textOverlays: [
+        {
+          text: '"Best purchase I\'ve made this year!"',
+          font: "{{body}}",
+          size: 30,
+          weight: "normal",
+          color: "{{text}}",
+          align: "center",
+          x: "center",
+          y: 780,
+        },
+        {
+          text: "— Happy Customer",
+          font: "{{body}}",
+          size: 22,
+          weight: "semibold",
+          color: "{{primary}}",
+          align: "center",
+          x: "center",
+          y: 840,
+        },
+        {
+          text: "★★★★★",
+          font: "{{body}}",
+          size: 28,
+          weight: "normal",
+          color: "#f59e0b",
+          align: "center",
+          x: "center",
+          y: 920,
+        },
+      ],
+    },
+  },
+
+  // 11. New Collection (promo)
+  {
+    name: "New Collection",
+    description: "Elegant promo card for new collection launches with premium feel.",
+    thumbnail: "/templates/new-collection.png",
+    category: "promo",
+    config: {
+      width: 1080,
+      height: 1080,
+      background: {
+        type: "gradient",
+        colors: ["{{secondary}}", "#2d2d3f"],
+        direction: "to bottom right",
+      },
+      layout: "centered",
+      productImage: {
+        maxWidth: 600,
+        maxHeight: 600,
+        x: "center",
+        y: "center",
+      },
+      textOverlays: [
+        {
+          text: "NEW COLLECTION",
+          font: "{{heading}}",
+          size: 24,
+          weight: "semibold",
+          color: "{{accent}}",
+          align: "center",
+          x: "center",
+          y: 80,
+        },
+        {
+          text: "Spring 2026",
+          font: "{{heading}}",
+          size: 52,
+          weight: "bold",
+          color: "#ffffff",
+          align: "center",
+          x: "center",
+          y: 140,
+        },
+        {
+          text: "Explore Now",
+          font: "{{body}}",
+          size: 26,
+          weight: "semibold",
+          color: "#ffffff",
+          align: "center",
+          x: "center",
+          y: 980,
+          background: {
+            color: "{{primary}}",
+            paddingX: 36,
+            paddingY: 12,
+            borderRadius: 8,
+          },
+        },
+      ],
+    },
+  },
+
+  // 12. Comparison Card (product)
+  {
+    name: "Comparison Card",
+    description: "Product comparison layout highlighting key features and price.",
+    thumbnail: "/templates/comparison-card.png",
+    category: "product",
+    config: {
+      width: 1080,
+      height: 1080,
+      background: {
+        type: "solid",
+        color: "#f8f9fa",
+      },
+      layout: "centered",
+      productImage: {
+        maxWidth: 500,
+        maxHeight: 500,
+        x: "center",
+        y: "center",
+        offsetY: -50,
+      },
+      textOverlays: [
+        {
+          text: "VS",
+          font: "{{heading}}",
+          size: 40,
+          weight: "bold",
+          color: "{{accent}}",
+          align: "center",
+          x: "center",
+          y: 80,
+        },
+        {
+          text: "Why Choose Us?",
+          font: "{{heading}}",
+          size: 44,
+          weight: "bold",
+          color: "{{text}}",
+          align: "center",
+          x: "center",
+          y: 860,
+        },
+        {
+          text: "Premium Quality • Free Shipping • 30-Day Returns",
+          font: "{{body}}",
+          size: 22,
+          weight: "normal",
+          color: "{{primary}}",
+          align: "center",
+          x: "center",
+          y: 920,
+        },
+        {
+          text: "Compare Now",
+          font: "{{body}}",
+          size: 26,
+          weight: "bold",
+          color: "#ffffff",
+          align: "center",
+          x: "center",
+          y: 1000,
+          background: {
+            color: "{{primary}}",
+            paddingX: 36,
+            paddingY: 12,
+            borderRadius: 8,
+          },
+        },
+      ],
+    },
+  },
+
+  // 13. Lifestyle Banner (ad, 1920x1080)
+  {
+    name: "Lifestyle Banner",
+    description: "Wide lifestyle banner for YouTube or web ads with large product focus.",
+    thumbnail: "/templates/lifestyle-banner.png",
+    category: "ad",
+    config: {
+      width: 1920,
+      height: 1080,
+      background: {
+        type: "gradient",
+        colors: ["{{primary}}", "{{secondary}}"],
+        direction: "to right",
+      },
+      layout: "split_horizontal",
+      productImage: {
+        maxWidth: 700,
+        maxHeight: 800,
+        x: 100,
+        y: "center",
+      },
+      textOverlays: [
+        {
+          text: "ELEVATE YOUR",
+          font: "{{heading}}",
+          size: 36,
+          weight: "semibold",
+          color: "rgba(255,255,255,0.7)",
+          align: "left",
+          x: 950,
+          y: 320,
+        },
+        {
+          text: "LIFESTYLE",
+          font: "{{heading}}",
+          size: 80,
+          weight: "bold",
+          color: "#ffffff",
+          align: "left",
+          x: 950,
+          y: 400,
+        },
+        {
+          text: "Discover premium products curated for you.",
+          font: "{{body}}",
+          size: 26,
+          weight: "normal",
+          color: "rgba(255,255,255,0.8)",
+          align: "left",
+          x: 950,
+          y: 470,
+        },
+        {
+          text: "Shop Collection",
+          font: "{{body}}",
+          size: 28,
+          weight: "bold",
+          color: "{{primary}}",
+          align: "center",
+          x: 1100,
+          y: 600,
+          background: {
+            color: "#ffffff",
+            paddingX: 40,
+            paddingY: 14,
+            borderRadius: 8,
+          },
+        },
+      ],
+    },
+  },
+];
+
+async function main() {
+  console.log("Seeding templates...");
+
+  for (const template of templates) {
+    await prisma.template.upsert({
+      where: { id: template.name.toLowerCase().replace(/\s+/g, "-") },
+      update: {
+        ...template,
+      },
+      create: {
+        id: template.name.toLowerCase().replace(/\s+/g, "-"),
+        ...template,
+      },
+    });
+    console.log(`  ✓ ${template.name}`);
+  }
+
+  console.log("Seeding complete.");
+}
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

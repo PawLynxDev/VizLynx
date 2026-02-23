@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --version:*)",
+      "Bash(npm:*)",
+      "Bash(pip --version:*)",
+      "Bash(pip3:*)",
+      "Bash(where:*)",
+      "Bash(py:*)",
+      "Bash(npx create-next-app:*)",
+      "Bash(npx prisma init:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(npx tsc:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(for font in roboto montserrat opensans oswald raleway nunito merriweather ubuntu rubik worksans quicksand mulish dmsans outfit spacegrotesk sora archivo plusjakartasans playfairdisplay)",
+      "Bash(do)",
+      "Bash(echo:*)",
+      "Bash(curl:*)",
+      "Bash(done)",
+      "WebSearch",
+      "Bash(npx prisma migrate dev:*)"
+    ]
+  }
+}
