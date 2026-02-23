@@ -21,30 +21,32 @@ export default function AllAssetsPage() {
           ))}
         </div>
       ) : projects?.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 text-center">
-          <ImageIcon className="mb-4 h-16 w-16 text-gray-300" />
-          <h2 className="mb-2 text-xl font-semibold text-gray-700">
+        <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-gray-200 bg-white py-24 shadow-sm">
+          <div className="mb-6 inline-flex rounded-full bg-gradient-to-br from-blue-100 to-purple-100 p-6">
+            <ImageIcon className="h-12 w-12 text-blue-600" />
+          </div>
+          <h3 className="mb-2 text-xl font-semibold text-gray-900">
             No assets yet
-          </h2>
-          <p className="text-gray-500">
+          </h3>
+          <p className="max-w-md text-center text-gray-600">
             Create content using Promote, Remove BG, or Brand Kits to see your assets here.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {projects?.map((project) => (
             <div
               key={project.id}
-              className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md"
+              className="group relative cursor-pointer overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md"
             >
-              <div className="aspect-square bg-gray-100 p-4">
+              <div className="aspect-square bg-gray-50 p-6">
                 {/* Placeholder for asset preview */}
                 <div className="flex h-full items-center justify-center">
-                  <ImageIcon className="h-12 w-12 text-gray-400" />
+                  <ImageIcon className="h-12 w-12 text-gray-300" />
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="font-medium text-gray-900">{project.name}</h3>
+                <h3 className="font-semibold text-gray-900">{project.name}</h3>
                 <p className="mt-1 text-sm text-gray-500">
                   {new Date(project.createdAt).toLocaleDateString()}
                 </p>

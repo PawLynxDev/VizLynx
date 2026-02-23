@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
 
@@ -34,10 +33,10 @@ export function BrandKitCard({
 
   return (
     <Link href={`/brand-kits/${id}`}>
-      <Card className="cursor-pointer transition-all hover:shadow-md">
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-sm">{name}</CardTitle>
+      <div className="group cursor-pointer overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md">
+        <div className="p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="font-semibold text-gray-900">{name}</h3>
             {isDefault && (
               <Badge variant="secondary" className="gap-1 text-xs">
                 <Star className="h-3 w-3" />
@@ -45,23 +44,23 @@ export function BrandKitCard({
               </Badge>
             )}
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-3 flex gap-1.5">
+
+          <div className="mb-4 flex gap-2">
             {colors.map((color, i) => (
               <div
                 key={i}
-                className="h-8 flex-1 rounded-md border border-gray-200"
+                className="h-10 flex-1 rounded-xl border-2 border-white shadow-sm"
                 style={{ backgroundColor: color }}
               />
             ))}
           </div>
-          <div className="space-y-1 text-xs text-gray-500">
-            <p>Heading: {fontHeading}</p>
-            <p>Body: {fontBody}</p>
+
+          <div className="space-y-1.5 text-sm text-gray-500">
+            <p className="truncate">Heading: <span className="text-gray-700">{fontHeading}</span></p>
+            <p className="truncate">Body: <span className="text-gray-700">{fontBody}</span></p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </Link>
   );
 }

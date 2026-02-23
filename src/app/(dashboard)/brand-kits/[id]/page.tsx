@@ -100,160 +100,171 @@ export default function EditBrandKitPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-2xl space-y-4">
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-96 w-full rounded-xl" />
+      <div className="container mx-auto px-4 py-8">
+        <div className="mx-auto max-w-3xl space-y-6">
+          <Skeleton className="h-12 w-64 rounded-xl" />
+          <Skeleton className="h-[600px] w-full rounded-3xl" />
+        </div>
       </div>
     );
   }
 
   if (!kit) {
     return (
-      <div className="py-24 text-center">
-        <p className="text-gray-500">Brand kit not found</p>
+      <div className="container mx-auto px-4 py-24 text-center">
+        <p className="text-lg text-gray-500">Brand kit not found</p>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/brand-kits">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold">Edit Brand Kit</h1>
-        </div>
-        <div className="flex gap-2">
-          {!kit.isDefault && (
+    <div className="container mx-auto px-4 py-8">
+      <div className="mx-auto max-w-3xl">
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link href="/brand-kits">
+              <Button variant="ghost" size="icon" className="rounded-xl">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Edit Brand Kit</h1>
+              <p className="mt-1 text-gray-600">Update your brand identity</p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            {!kit.isDefault && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDefaultMutation.mutate({ id: brandKitId })}
+                disabled={setDefaultMutation.isPending}
+                className="rounded-xl"
+              >
+                <Star className="mr-1.5 h-4 w-4" />
+                Set Default
+              </Button>
+            )}
             <Button
-              variant="outline"
+              variant="destructive"
               size="sm"
-              onClick={() => setDefaultMutation.mutate({ id: brandKitId })}
-              disabled={setDefaultMutation.isPending}
+              onClick={() => {
+                if (confirm("Delete this brand kit?")) {
+                  deleteMutation.mutate({ id: brandKitId });
+                }
+              }}
+              disabled={deleteMutation.isPending}
+              className="rounded-xl"
             >
-              <Star className="mr-1 h-3.5 w-3.5" />
-              Set Default
+              <Trash2 className="mr-1.5 h-4 w-4" />
+              Delete
             </Button>
-          )}
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => {
-              if (confirm("Delete this brand kit?")) {
-                deleteMutation.mutate({ id: brandKitId });
-              }
-            }}
-            disabled={deleteMutation.isPending}
-          >
-            <Trash2 className="mr-1 h-3.5 w-3.5" />
-            Delete
-          </Button>
-        </div>
-      </div>
-
-      <div className="space-y-6">
-        <div>
-          <label className="mb-2 block text-sm font-medium">Brand Kit Name</label>
-          <Input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            maxLength={100}
-          />
-        </div>
-
-        <div>
-          <h3 className="mb-3 text-sm font-medium">Colors</h3>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-            <ColorPicker label="Primary" value={colorPrimary} onChange={setColorPrimary} />
-            <ColorPicker label="Secondary" value={colorSecondary} onChange={setColorSecondary} />
-            <ColorPicker label="Accent" value={colorAccent} onChange={setColorAccent} />
-            <ColorPicker label="Background" value={colorBackground} onChange={setColorBackground} />
-            <ColorPicker label="Text" value={colorText} onChange={setColorText} />
           </div>
         </div>
 
-        <div>
-          <h3 className="mb-3 text-sm font-medium">Fonts</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-700">Heading Font</label>
-              <select
-                value={fontHeading}
-                onChange={(e) => setFontHeading(e.target.value)}
-                className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm"
-              >
-                {FONT_LIST.map((f) => (
-                  <option key={f} value={f}>{f}</option>
-                ))}
-              </select>
+        <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
+          <div className="space-y-8">
+            <div>
+              <label className="mb-3 block text-sm font-semibold text-gray-900">Brand Kit Name</label>
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={100}
+                className="rounded-xl border-gray-200 text-base"
+              />
             </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-700">Body Font</label>
-              <select
-                value={fontBody}
-                onChange={(e) => setFontBody(e.target.value)}
-                className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm"
-              >
-                {FONT_LIST.map((f) => (
-                  <option key={f} value={f}>{f}</option>
-                ))}
-              </select>
+
+            <div>
+              <h3 className="mb-4 text-sm font-semibold text-gray-900">Colors</h3>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                <ColorPicker label="Primary" value={colorPrimary} onChange={setColorPrimary} />
+                <ColorPicker label="Secondary" value={colorSecondary} onChange={setColorSecondary} />
+                <ColorPicker label="Accent" value={colorAccent} onChange={setColorAccent} />
+                <ColorPicker label="Background" value={colorBackground} onChange={setColorBackground} />
+                <ColorPicker label="Text" value={colorText} onChange={setColorText} />
+              </div>
             </div>
+
+            <div>
+              <h3 className="mb-4 text-sm font-semibold text-gray-900">Fonts</h3>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Heading Font</label>
+                  <select
+                    value={fontHeading}
+                    onChange={(e) => setFontHeading(e.target.value)}
+                    className="h-11 w-full rounded-xl border border-gray-200 px-4 text-sm transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                  >
+                    {FONT_LIST.map((f) => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Body Font</label>
+                  <select
+                    value={fontBody}
+                    onChange={(e) => setFontBody(e.target.value)}
+                    className="h-11 w-full rounded-xl border border-gray-200 px-4 text-sm transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                  >
+                    {FONT_LIST.map((f) => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-4 text-sm font-semibold text-gray-900">Logos</h3>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <LogoUploader
+                  label="Light Logo (for dark backgrounds)"
+                  currentUrl={logoLightUrl}
+                  brandKitId={brandKitId}
+                  variant="light"
+                  onUploaded={(url, key) => {
+                    setLogoLightUrl(url);
+                    setLogoLightKey(key);
+                  }}
+                  onRemoved={() => {
+                    setLogoLightUrl(null);
+                    setLogoLightKey(null);
+                  }}
+                />
+                <LogoUploader
+                  label="Dark Logo (for light backgrounds)"
+                  currentUrl={logoDarkUrl}
+                  brandKitId={brandKitId}
+                  variant="dark"
+                  onUploaded={(url, key) => {
+                    setLogoDarkUrl(url);
+                    setLogoDarkKey(key);
+                  }}
+                  onRemoved={() => {
+                    setLogoDarkUrl(null);
+                    setLogoDarkKey(null);
+                  }}
+                />
+              </div>
+            </div>
+
+            <Button
+              onClick={handleSave}
+              disabled={!name.trim() || updateMutation.isPending}
+              className="h-12 w-full rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 text-base font-semibold shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-xl"
+            >
+              {updateMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save Changes"
+              )}
+            </Button>
           </div>
         </div>
-
-        <div>
-          <h3 className="mb-3 text-sm font-medium">Logos</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <LogoUploader
-              label="Light Logo (for dark backgrounds)"
-              currentUrl={logoLightUrl}
-              brandKitId={brandKitId}
-              variant="light"
-              onUploaded={(url, key) => {
-                setLogoLightUrl(url);
-                setLogoLightKey(key);
-              }}
-              onRemoved={() => {
-                setLogoLightUrl(null);
-                setLogoLightKey(null);
-              }}
-            />
-            <LogoUploader
-              label="Dark Logo (for light backgrounds)"
-              currentUrl={logoDarkUrl}
-              brandKitId={brandKitId}
-              variant="dark"
-              onUploaded={(url, key) => {
-                setLogoDarkUrl(url);
-                setLogoDarkKey(key);
-              }}
-              onRemoved={() => {
-                setLogoDarkUrl(null);
-                setLogoDarkKey(null);
-              }}
-            />
-          </div>
-        </div>
-
-        <Button
-          onClick={handleSave}
-          disabled={!name.trim() || updateMutation.isPending}
-          className="w-full"
-          size="lg"
-        >
-          {updateMutation.isPending ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            "Save Changes"
-          )}
-        </Button>
       </div>
     </div>
   );
