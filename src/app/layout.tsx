@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Geist } from "next/font/google";
 import { TRPCProvider } from "@/components/TRPCProvider";
+import { Header } from "@/components/Header";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -11,8 +12,8 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "PixelForge",
-  description: "AI-powered marketing content studio for e-commerce",
+  title: "VizLynx - AI-Powered Marketing Studio",
+  description: "Create stunning marketing content for e-commerce with AI. Product promotions, background removal, and brand management.",
 };
 
 export default function RootLayout({
@@ -25,6 +26,7 @@ export default function RootLayout({
       <html lang="en">
         <body className={`${geistSans.variable} font-sans antialiased`}>
           <TRPCProvider>
+            <Header />
             {children}
             <Toaster position="bottom-right" richColors />
           </TRPCProvider>

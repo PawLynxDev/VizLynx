@@ -11,8 +11,10 @@ import { TextOverlayEditor } from "@/components/promote/TextOverlayEditor";
 import { VideoGenerator } from "@/components/promote/VideoGenerator";
 import { PromotionExports } from "@/components/promote/PromotionExports";
 import { toast } from "sonner";
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 
 export default function PromotePage() {
+  const { requireAuth } = useAuthRedirect();
   const store = usePromotionStore();
   const [textPosition, setTextPosition] = useState<"top" | "center" | "bottom">("bottom");
   const [selectedBrandKitId, setSelectedBrandKitId] = useState<string | undefined>();
@@ -111,6 +113,9 @@ export default function PromotePage() {
     fileSize: number;
     mimeType: string;
   }) => {
+    // Check authentication before processing
+    if (!requireAuth()) return;
+
     store.setSourceImage(data.publicUrl);
     store.setAnalysisStatus("loading");
 
@@ -125,6 +130,7 @@ export default function PromotePage() {
   };
 
   const handleGenerate = () => {
+    if (!requireAuth()) return;
     if (!store.promotionId) return;
     store.setImageGenerationStatus("loading");
 
@@ -135,6 +141,7 @@ export default function PromotePage() {
   };
 
   const handleReanalyze = (tone: string) => {
+    if (!requireAuth()) return;
     if (!store.promotionId) return;
     reanalyze.mutate({
       id: store.promotionId,
@@ -144,6 +151,7 @@ export default function PromotePage() {
   };
 
   const handleApplyText = () => {
+    if (!requireAuth()) return;
     if (!store.promotionId) return;
     store.setCompositingStatus("loading");
 
@@ -157,6 +165,7 @@ export default function PromotePage() {
   };
 
   const handleGenerateVideo = () => {
+    if (!requireAuth()) return;
     if (!store.promotionId) return;
     store.setVideoStatus("loading");
 
@@ -166,6 +175,7 @@ export default function PromotePage() {
   };
 
   const handleExport = (sizeIds: string[]) => {
+    if (!requireAuth()) return;
     if (!store.promotionId || sizeIds.length === 0) return;
     exportSizes.mutate({
       id: store.promotionId,

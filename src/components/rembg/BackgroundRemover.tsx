@@ -5,16 +5,21 @@ import { Upload, Download, Loader2, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 
 type Status = "idle" | "uploading" | "processing" | "done" | "error";
 
 export function BackgroundRemover() {
+  const { requireAuth } = useAuthRedirect();
   const [status, setStatus] = useState<Status>("idle");
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
 
   const handleFile = useCallback(async (file: File) => {
+    // Check authentication before processing
+    if (!requireAuth()) return;
+
     if (!file.type.startsWith("image/")) {
       toast.error("Please upload an image file");
       return;
@@ -43,7 +48,7 @@ export function BackgroundRemover() {
       setStatus("error");
       toast.error(err instanceof Error ? err.message : "Failed to remove background");
     }
-  }, []);
+  }, [requireAuth]);
 
   const onDrop = useCallback(
     (e: React.DragEvent) => {
