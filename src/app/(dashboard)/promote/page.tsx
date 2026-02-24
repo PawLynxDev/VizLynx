@@ -1,22 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { usePromotionStore } from "@/stores/promotionStore";
-import { ProductUploader } from "@/components/promote/ProductUploader";
-import { AnalysisPanel } from "@/components/promote/AnalysisPanel";
-import { FluxPreview } from "@/components/promote/FluxPreview";
-import { TextOverlayEditor } from "@/components/promote/TextOverlayEditor";
-import { VideoGenerator } from "@/components/promote/VideoGenerator";
-import { PromotionExports } from "@/components/promote/PromotionExports";
 import { toast } from "sonner";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
+import { AnimatePresence } from "framer-motion";
+
+// New components
+import { ProductUploader } from "@/components/promote/ProductUploader";
+import { ImagePreviewTabs } from "@/components/promote/ImagePreviewTabs";
+import { MarketingCopyPanel } from "@/components/promote/MarketingCopyPanel";
+import { PromptBottomPanel } from "@/components/promote/PromptBottomPanel";
+import { ExpandableSection } from "@/components/promote/ExpandableSection";
+import { VideoGenerator } from "@/components/promote/VideoGenerator";
+import { PromotionExports } from "@/components/promote/PromotionExports";
 
 export default function PromotePage() {
   const { requireAuth } = useAuthRedirect();
   const store = usePromotionStore();
-  const [textPosition, setTextPosition] = useState<"top" | "center" | "bottom">("bottom");
   const [selectedBrandKitId, setSelectedBrandKitId] = useState<string | undefined>();
   const [exportItems, setExportItems] = useState<
     Array<{ id: string; imageUrl: string; width: number; height: number; sizeLabel: string }>
@@ -73,18 +76,6 @@ export default function PromotePage() {
     },
   });
 
-  const compositeText = trpc.promotion.compositeText.useMutation({
-    onSuccess: (data) => {
-      if (data.finalImageUrl) {
-        store.setFinalImage(data.finalImageUrl);
-      }
-    },
-    onError: (err) => {
-      store.setCompositingStatus("error");
-      toast.error(err.message);
-    },
-  });
-
   const generateVideo = trpc.promotion.generateVideo.useMutation({
     onSuccess: (data) => {
       if (data.videoUrl) {
@@ -113,7 +104,6 @@ export default function PromotePage() {
     fileSize: number;
     mimeType: string;
   }) => {
-    // Check authentication before processing
     if (!requireAuth()) return;
 
     store.setSourceImage(data.publicUrl);
@@ -150,20 +140,6 @@ export default function PromotePage() {
     });
   };
 
-  const handleApplyText = () => {
-    if (!requireAuth()) return;
-    if (!store.promotionId) return;
-    store.setCompositingStatus("loading");
-
-    compositeText.mutate({
-      id: store.promotionId,
-      headline: store.editedHeadline,
-      subline: store.editedSubline || undefined,
-      cta: store.editedCta || undefined,
-      textPosition,
-    });
-  };
-
   const handleGenerateVideo = () => {
     if (!requireAuth()) return;
     if (!store.promotionId) return;
@@ -183,68 +159,77 @@ export default function PromotePage() {
     });
   };
 
-  const handleStartOver = () => {
+  const handleReset = () => {
     store.reset();
     setExportItems([]);
-    setTextPosition("bottom");
   };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold">
-            <Sparkles className="h-6 w-6 text-violet-600" />
-            Product Promotion
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Upload a product photo and let AI create marketing content
-          </p>
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      <div className="container mx-auto flex-1 px-4 py-8">
+        <div className="mx-auto max-w-7xl">
+          {/* Upload State - Full screen upload area */}
+          {!store.sourceImageUrl && <ProductUploader onUploaded={handleUploaded} />}
+
+          {/* Analyzing Loading State */}
+          {store.analysisStatus === "loading" && (
+            <div className="flex min-h-[500px] items-center justify-center rounded-3xl border border-gray-200 bg-white shadow-sm">
+              <div className="text-center">
+                <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-blue-600" />
+                <p className="text-lg font-semibold text-gray-900">Analyzing your product...</p>
+                <p className="mt-1 text-sm text-gray-600">AI is generating marketing content</p>
+              </div>
+            </div>
+          )}
+
+          {/* Working State - Preview + Marketing Copy + Bottom Panel */}
+          {store.sourceImageUrl && store.analysisStatus !== "loading" && (
+            <>
+              {/* Image Preview Tabs */}
+              <ImagePreviewTabs
+                sourceImageUrl={store.sourceImageUrl}
+                fluxImageUrl={store.fluxImageUrl}
+                finalImageUrl={store.finalImageUrl}
+                onReset={handleReset}
+              />
+
+              {/* Marketing Copy Panel */}
+              <AnimatePresence>
+                {store.analysisStatus === "done" && (
+                  <div className="mt-6">
+                    <MarketingCopyPanel />
+                  </div>
+                )}
+              </AnimatePresence>
+
+              {/* Expandable Sections */}
+              {(store.fluxImageUrl || store.finalImageUrl) && (
+                <div className="mt-6 space-y-4">
+                  <ExpandableSection title="Video Generator" defaultExpanded={false}>
+                    <VideoGenerator
+                      videoUrl={store.videoUrl}
+                      videoStatus={store.videoStatus}
+                      onGenerate={handleGenerateVideo}
+                    />
+                  </ExpandableSection>
+
+                  <ExpandableSection title="Export Sizes" defaultExpanded={false}>
+                    <PromotionExports
+                      exports={exportItems}
+                      onExport={handleExport}
+                      exporting={exportSizes.isPending}
+                    />
+                  </ExpandableSection>
+                </div>
+              )}
+            </>
+          )}
         </div>
-        {store.promotionId && (
-          <button
-            onClick={handleStartOver}
-            className="text-sm text-gray-500 hover:text-gray-700"
-          >
-            Start Over
-          </button>
-        )}
       </div>
 
-      {/* Section 1: Upload */}
-      {!store.sourceImageUrl && <ProductUploader onUploaded={handleUploaded} />}
-
-      {/* Analyzing spinner */}
-      {store.analysisStatus === "loading" && (
-        <div className="flex items-center gap-3 rounded-lg border bg-white p-6">
-          <Loader2 className="h-5 w-5 animate-spin text-violet-600" />
-          <div>
-            <p className="text-sm font-medium">Analyzing your product...</p>
-            <p className="text-xs text-gray-500">AI is generating a marketing prompt and copy</p>
-          </div>
-        </div>
-      )}
-
-      {/* Source image preview (small) */}
-      {store.sourceImageUrl && store.analysisStatus !== "loading" && (
-        <div className="flex items-center gap-4 rounded-lg border bg-white p-4">
-          <img
-            src={store.sourceImageUrl}
-            alt="Source"
-            className="h-16 w-16 rounded-lg object-cover"
-          />
-          <div className="text-sm">
-            <p className="font-medium">Product photo uploaded</p>
-            <p className="text-gray-500">
-              {store.analysisStatus === "done" ? "AI analysis complete" : "Ready to analyze"}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Section 2: Edit Prompt & Text */}
-      {store.analysisStatus === "done" && (
-        <AnalysisPanel
+      {/* Bottom Fixed Panel - Prompt Input */}
+      {store.sourceImageUrl && store.analysisStatus === "done" && (
+        <PromptBottomPanel
           onGenerate={handleGenerate}
           onReanalyze={handleReanalyze}
           generating={generateImage.isPending}
@@ -253,39 +238,6 @@ export default function PromotePage() {
           selectedBrandKitId={selectedBrandKitId}
           onBrandKitChange={setSelectedBrandKitId}
         />
-      )}
-
-      {/* Section 3: Flux Preview + Text Overlay */}
-      {store.fluxImageUrl && !store.finalImageUrl && (
-        <FluxPreview
-          fluxImageUrl={store.fluxImageUrl}
-          onRegenerate={handleGenerate}
-          onApplyText={handleApplyText}
-          regenerating={generateImage.isPending}
-          applyingText={compositeText.isPending}
-          textPosition={textPosition}
-          onTextPositionChange={setTextPosition}
-        />
-      )}
-
-      {/* Final image with text */}
-      {store.finalImageUrl && <TextOverlayEditor finalImageUrl={store.finalImageUrl} />}
-
-      {/* Section 4: Video & Export */}
-      {(store.finalImageUrl || store.fluxImageUrl) && (
-        <>
-          <VideoGenerator
-            videoUrl={store.videoUrl}
-            videoStatus={store.videoStatus}
-            onGenerate={handleGenerateVideo}
-          />
-
-          <PromotionExports
-            exports={exportItems}
-            onExport={handleExport}
-            exporting={exportSizes.isPending}
-          />
-        </>
       )}
     </div>
   );

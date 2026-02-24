@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Sparkles, Eraser, Palette, Video, Upload, Wand2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/Footer";
@@ -23,16 +24,22 @@ export default async function Home() {
       />
 
       {/* Hero Section */}
-      <section className="relative px-4 pt-32 pb-20 md:pt-40 md:pb-32">
-        <div className="container mx-auto max-w-6xl">
+      <section className="relative overflow-hidden px-4 pt-32 pb-20 md:pt-40 md:pb-32">
+        {/* Hero Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/hero-bg.jpg"
+            alt="Hero background"
+            fill
+            className="object-cover"
+            priority
+          />
+          {/* Gradient overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/50 to-white/70" />
+        </div>
+
+        <div className="container relative z-10 mx-auto max-w-6xl">
           <div className="text-center">
-            {/* Animated Badge */}
-            <AnimatedText delay={0.1}>
-              <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm">
-                <Sparkles className="h-4 w-4" />
-                AI-Powered Marketing Studio
-              </div>
-            </AnimatedText>
 
             {/* Main Headline with Split Text Animation */}
             <SplitText
